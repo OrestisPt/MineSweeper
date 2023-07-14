@@ -18,6 +18,7 @@ There is also an exe version for windows users. To run it, just double click on 
 
 ## <ins> Controls: </ins>
 ``` 
+ESC - Quit
 Ctrl + R - Force Reset
 R - Reset (Only if the game is over)
 ```
