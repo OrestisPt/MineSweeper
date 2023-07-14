@@ -40,7 +40,7 @@ void interface_draw_frame(State state){
         }
     }
     if(info->is_game_won){
-    DrawText("You Win!", 20, 20, 40, BLACK);
+        DrawText("You Win!", 20, 20, 40, BLACK);
     }
     if(info->is_game_lost){
         DrawText("You Lose!", 20, 20, 40, BLACK);

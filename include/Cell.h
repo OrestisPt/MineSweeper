@@ -26,3 +26,5 @@ int cell_get_mine_count(Cell cell);
 int compute_adjacent_mines(Cell** array, int x, int y);
 
 void set_mines(Cell** array, int num_mines);
+
+void cell_destroy(Cell cell);

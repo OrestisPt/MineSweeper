@@ -2,19 +2,21 @@
 #include "raylib.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 struct state{
     Cell** array;
     bool is_game_over;
     bool is_game_won;
     bool is_game_lost;
+    int revealed_count;
 };
 
 State state_create(void){
     State state = malloc(sizeof(struct state));
-    state->array = malloc(sizeof(Cell) * 16);
+    state->array = malloc(sizeof(Cell*) * 16);
     for(int i = 0; i < 16; i++){
-        state->array[i] = malloc(sizeof(*state->array) * 16);
+        state->array[i] = malloc(sizeof(Cell) * 16);
     }
     for(int i = 0; i < 16; i++){
         for(int j = 0; j < 16; j++){
@@ -30,6 +32,8 @@ State state_create(void){
     state->is_game_over = false;
     state->is_game_won = false;
     state->is_game_lost = false;
+    state->revealed_count = 0;
+
     return state;
 }
 
@@ -44,19 +48,38 @@ void state_update(State state){
         MouseX /= (SCREEN_WIDTH/17);
         MouseY -= 20;
         MouseY /= (SCREEN_HEIGHT/17);
-        Cell cell = state->array[MouseX][MouseY];
-        if(cell_is_mine(cell)){
-            cell_set_revealed(cell);
-            state->is_game_over = true;
-            state->is_game_lost = true;
+        if(MouseX < 0 || MouseX > 15 || MouseY < 0 || MouseY > 15){
             return;
         }
-        if(!cell_is_flagged(cell))
+        Cell cell = state->array[MouseX][MouseY];
+        // if(cell_is_mine(cell)){
+        //     cell_set_revealed(cell);
+        //     state->is_game_over = true;
+        //     state->is_game_lost = true;
+        //     return;
+        // }
+        if(!cell_is_flagged(cell)){
             cell_set_revealed(cell);
+        }
         if(cell_get_mine_count(cell) == 0){
+            state->revealed_count -= 1;
             reveal_zero_pool(state->array, MouseX, MouseY);
         }
         
+    }
+    int count = 0;
+    for(int i = 0; i < 16; i++){
+        for(int j = 0; j < 16; j++){
+            if(cell_is_revealed(state->array[i][j]) && !cell_is_mine(state->array[i][j])){
+                count += 1;
+            }
+        }
+    }
+    state->revealed_count = count;
+    if(state->revealed_count >= 216){
+        state->is_game_over = true;
+        state->is_game_won = true;
+        return;
     }
     if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)){
         int MouseX = GetMouseX();
@@ -65,9 +88,13 @@ void state_update(State state){
         MouseX /= (SCREEN_WIDTH/17);
         MouseY -= 20;
         MouseY /= (SCREEN_HEIGHT/17);
+        if(MouseX < 0 || MouseX > 15 || MouseY < 0 || MouseY > 15){
+            return;
+        }
         Cell cell = state->array[MouseX][MouseY];
         cell_set_flagged(cell, !cell_is_flagged(cell));
     }
+    printf("%d\n", state->revealed_count);
 }
 
 StateInfo state_info(State state){

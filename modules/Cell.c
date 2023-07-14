@@ -86,3 +86,7 @@ void reveal_zero_pool(Cell** array, int x, int y){
         }
     }
 }
+
+void cell_destroy(Cell cell){
+    free(cell);
+}
