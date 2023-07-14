@@ -1,4 +1,5 @@
 #include "state.h"
+#include "raylib.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -17,22 +18,56 @@ State state_create(void){
     }
     for(int i = 0; i < 16; i++){
         for(int j = 0; j < 16; j++){
-            state->array[i][j] = cell_create(i, j, false, true, false);
+            state->array[i][j] = cell_create(i, j, false, false, false);
         }
     }
-    state->array[0][0]->is_mine = true;
-    state->array[0][2]->is_mine = true;
     set_mines(state->array, 40);
     for(int i = 0; i < 16; i++){
         for(int j = 0; j < 16; j++){
-            state->array[i][j]->adjacent_mines = compute_adjacent_mines(state->array, i, j);
+            cell_set_adjacent_mines(state->array[i][j], compute_adjacent_mines(state->array, i, j)); 
         }
     }
+    state->is_game_over = false;
+    state->is_game_won = false;
+    state->is_game_lost = false;
     return state;
 }
 
 void state_update(State state){
-
+    if(state->is_game_over){
+        return;
+    }
+    if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+        int MouseX = GetMouseX();
+        int MouseY = GetMouseY(); 
+        MouseX -= 20;
+        MouseX /= (SCREEN_WIDTH/17);
+        MouseY -= 20;
+        MouseY /= (SCREEN_HEIGHT/17);
+        Cell cell = state->array[MouseX][MouseY];
+        if(cell_is_mine(cell)){
+            cell_set_revealed(cell);
+            state->is_game_over = true;
+            state->is_game_lost = true;
+            return;
+        }
+        if(!cell_is_flagged(cell))
+            cell_set_revealed(cell);
+        if(cell_get_mine_count(cell) == 0){
+            reveal_zero_pool(state->array, MouseX, MouseY);
+        }
+        
+    }
+    if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)){
+        int MouseX = GetMouseX();
+        int MouseY = GetMouseY(); 
+        MouseX -= 20;
+        MouseX /= (SCREEN_WIDTH/17);
+        MouseY -= 20;
+        MouseY /= (SCREEN_HEIGHT/17);
+        Cell cell = state->array[MouseX][MouseY];
+        cell_set_flagged(cell, !cell_is_flagged(cell));
+    }
 }
 
 StateInfo state_info(State state){

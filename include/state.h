@@ -1,6 +1,9 @@
 #pragma once
 #include "Cell.h"
 
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 800
+
 typedef struct state *State;
 
 typedef struct state_info{
