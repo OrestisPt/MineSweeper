@@ -2,7 +2,6 @@
 #include "raylib.h"
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 struct state{
     Cell** array;
@@ -44,6 +43,9 @@ void state_update(State state){
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         int MouseX = GetMouseX();
         int MouseY = GetMouseY(); 
+        if(MouseX < 20 || MouseX > 780 || MouseY < 20 || MouseY > 780){
+            return;
+        }
         MouseX -= 20;
         MouseX /= (SCREEN_WIDTH/17);
         MouseY -= 20;
@@ -52,16 +54,17 @@ void state_update(State state){
             return;
         }
         Cell cell = state->array[MouseX][MouseY];
-        // if(cell_is_mine(cell)){
-        //     cell_set_revealed(cell);
-        //     state->is_game_over = true;
-        //     state->is_game_lost = true;
-        //     return;
-        // }
+        if(cell_is_mine(cell) && !cell_is_flagged(cell)){
+            cell_set_revealed(cell);
+            reveal_all_mines(state->array);
+            state->is_game_over = true;
+            state->is_game_lost = true;
+            return;
+        }
         if(!cell_is_flagged(cell)){
             cell_set_revealed(cell);
         }
-        if(cell_get_mine_count(cell) == 0){
+        if(cell_get_mine_count(cell) == 0 && !cell_is_flagged(cell)){
             state->revealed_count -= 1;
             reveal_zero_pool(state->array, MouseX, MouseY);
         }
@@ -84,6 +87,9 @@ void state_update(State state){
     if(IsMouseButtonPressed(MOUSE_RIGHT_BUTTON)){
         int MouseX = GetMouseX();
         int MouseY = GetMouseY(); 
+        if(MouseX < 20 || MouseX > 780 || MouseY < 20 || MouseY > 780){
+            return;
+        }
         MouseX -= 20;
         MouseX /= (SCREEN_WIDTH/17);
         MouseY -= 20;
@@ -94,7 +100,6 @@ void state_update(State state){
         Cell cell = state->array[MouseX][MouseY];
         cell_set_flagged(cell, !cell_is_flagged(cell));
     }
-    printf("%d\n", state->revealed_count);
 }
 
 StateInfo state_info(State state){
@@ -111,6 +116,11 @@ void stateinfo_destroy(StateInfo info){
 }
 
 void state_destroy(State state){
+    for(int i = 0; i < 16; i++){
+        for(int j = 0; j < 16; j++){
+            cell_destroy(state->array[i][j]);
+        }
+    }
     for(int i = 0; i < 16; i++){
         free(state->array[i]);
     }

@@ -87,6 +87,16 @@ void reveal_zero_pool(Cell** array, int x, int y){
     }
 }
 
+void reveal_all_mines(Cell** array){
+    for(int i = 0; i < 16; i++){
+        for(int j = 0; j < 16; j++){
+            if(cell_is_mine(array[i][j])){
+                array[i][j]->is_revealed = true;
+            }
+        }
+    }
+}
+
 void cell_destroy(Cell cell){
     free(cell);
 }

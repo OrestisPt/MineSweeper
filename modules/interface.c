@@ -40,10 +40,14 @@ void interface_draw_frame(State state){
         }
     }
     if(info->is_game_won){
-        DrawText("You Win!", 20, 20, 40, BLACK);
+        int size = MeasureText("You Win!", 40);
+        DrawRectangle(SCREEN_WIDTH/2 - size/2 ,SCREEN_HEIGHT/2, size, 40, RAYWHITE);
+        DrawText("You Win!", SCREEN_WIDTH/2 - size/2 ,SCREEN_HEIGHT/2, 40, BLACK);
     }
     if(info->is_game_lost){
-        DrawText("You Lose!", 20, 20, 40, BLACK);
+        int size = MeasureText("You Lose!", 40);
+        DrawRectangle(SCREEN_WIDTH/2 - size/2 ,SCREEN_HEIGHT/2, size, 40, RAYWHITE);
+        DrawText("You Lose!", SCREEN_WIDTH/2 - size/2 ,SCREEN_HEIGHT/2, 40, BLACK);
     }
     EndDrawing();
     stateinfo_destroy(info);
