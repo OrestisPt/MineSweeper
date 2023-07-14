@@ -8,7 +8,8 @@ int main(void){
     state = state_create();
     interface_init();
     while(!WindowShouldClose()){
-        if(state_info(state)->is_game_over){
+        StateInfo info = state_info(state);
+        if(info->is_game_over){
             if(IsKeyPressed(KEY_R)){
                 state_destroy(state);
                 state = state_create();
@@ -20,6 +21,7 @@ int main(void){
         }
         state_update(state);
         interface_draw_frame(state);
+        stateinfo_destroy(info);
     }
     interface_close();
     state_destroy(state);
